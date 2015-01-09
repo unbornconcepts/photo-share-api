@@ -1,0 +1,29 @@
+{
+  "name": "photo-share-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://nnance@github.com/unbornconcepts/photo-share-api.git"
+  },
+  "author": "Nick Nance",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/unbornconcepts/photo-share-api/issues"
+  },
+  "homepage": "https://github.com/unbornconcepts/photo-share-api",
+  "dependencies": {
+    "body-parser": "^1.10.1",
+    "config": "^1.10.0",
+    "cors": "^2.5.2",
+    "express": "^4.10.7",
+    "lodash": "^2.4.1",
+    "mongoose": "^3.8.21",
+    "winston": "^0.8.3"
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "port": 9000,
+  "db": "mongodb://localhost/photo-share-development",
+  "mandrillKey": "E8E96aaOVPwYG1G03X-9GQ",
+  "logger": {
+    "console": {
+        "level": "debug",
+        "colorize": true,
+        "timestamp": true
+    }
+  }
+}
