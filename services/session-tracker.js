@@ -11,9 +11,9 @@ var Session = mongoose.model('Session', {
   pos: {type: [Number], index: '2d'}
 });
 
-function initialize(bus) {
-  bus.on('event:session:start', _.partial(sessionStarted,bus));
-  bus.on('event:session:stop', _.partial(sessionStopped,bus));
+function initialize(bus, con) {
+  con.on('session:start', _.partial(sessionStarted,bus));
+  con.on('session:stop', _.partial(sessionStopped,bus));
 }
 
 function sessionStarted(bus, data) {
@@ -47,9 +47,11 @@ function sessionStopped(bus, data) {
 
 function broadcastChanges(bus, loc) {
   Session.find({pos: { $near: loc, $maxDistance: 0.01} }, function(err, sessions){
-    sessions = [sessions[0], sessions[1]];
     console.log('session-tracker: sending sessions: ' + sessions.length);
-    bus.broadcast.emit('event:sessions', sessions);
+    
+    // convert the response to simple objects
+    var resp = JSON.parse(JSON.stringify(sessions));
+    bus.emit('event:sessions', resp);
   });
 }
 

@@ -8,7 +8,7 @@ var io = require('socket.io')(server);
 
 
 io.on('connection', function(socket){
-  require('./services')(socket);
+  require('./services')(io, socket);
 
   socket.on('event:new:image',function(data){
     console.log('new image from ' + data.name);
