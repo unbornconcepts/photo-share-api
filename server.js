@@ -6,10 +6,9 @@ var app = express();
 var server = http.Server(app);
 var io = require('socket.io')(server);
 
+
 io.on('connection', function(socket){
-  socket.on('event:session:start', function(data){
-    console.log('session started ' + data.name + ' at: ' + data.loc[0] + ',' + data.loc[1]);
-  });
+  require('./services')(socket);
 
   socket.on('event:new:image',function(data){
     console.log('new image from ' + data.name);
