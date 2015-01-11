@@ -22,10 +22,11 @@ function sessionStarted(bus, data) {
   session.startPos = session.pos;
   session.save(function (err) {
     if (err) {
-      console.log('session-tracker - Error saving to db: ' + err);
+      console.log('session-tracker: Error saving to db: ' + err);
     } else {
       // bus.emit('session:started', session);
       console.log('session-tracker started ' + session.name + ' at: ' + session.startPos[0] + ',' + session.startPos[1]);
+      broadcastChanges(bus, session.startPos);
     }
   });
 }
@@ -33,14 +34,22 @@ function sessionStarted(bus, data) {
 function sessionStopped(bus, data) {
   Session.findOne(data, function(err, session){
     if (err) {
-      console.log('session-tracker - Error deleting from db: ' + err);
+      console.log('session-tracker: Error deleting from db: ' + err);
     } else if (session === null) {
-      console.log('session-tracker - Error finding doc for delete');
+      console.log('session-tracker: Error finding doc for delete');
     } else {
       session.remove();
       // bus.emit('session:stopped', session);
-      console.log('session-tracker - sessionStopped ' + session.name);
+      console.log('session-tracker: sessionStopped ' + session.name);
     }
+  });
+}
+
+function broadcastChanges(bus, loc) {
+  Session.find({pos: { $near: loc, $maxDistance: 0.01} }, function(err, sessions){
+    sessions = [sessions[0], sessions[1]];
+    console.log('session-tracker: sending sessions: ' + sessions.length);
+    bus.broadcast.emit('event:sessions', sessions);
   });
 }
 
