@@ -54,17 +54,20 @@ function sessionStopped(bus, data) {
       session.remove();
       // bus.emit('session:stopped', session);
       console.log('session-tracker: sessionStopped ' + session.name);
+      broadcastChanges(bus, data.pos);
     }
   });
 }
 
 function broadcastChanges(bus, loc) {
   Session.find({pos: { $near: loc, $maxDistance: 0.01} }, function(err, sessions){
-    console.log('session-tracker: sending sessions: ' + sessions.length);
+    if (sessions) {
+      console.log('session-tracker: sending sessions: ' + sessions.length);
 
-    // convert the response to simple objects
-    var resp = JSON.parse(JSON.stringify(sessions));
-    bus.emit('event:sessions', resp);
+      // convert the response to simple objects
+      var resp = JSON.parse(JSON.stringify(sessions));
+      bus.emit('event:sessions', resp);      
+    }
   });
 }
 
