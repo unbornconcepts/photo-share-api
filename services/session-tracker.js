@@ -13,6 +13,7 @@ var Session = mongoose.model('Session', {
 
 function initialize(bus, con) {
   con.on('session:start', _.partial(sessionStarted,bus));
+  con.on('session:update', _.partial(sessionUpdate,bus));
   con.on('session:stop', _.partial(sessionStopped,bus));
 }
 
@@ -27,6 +28,18 @@ function sessionStarted(bus, data) {
       // bus.emit('session:started', session);
       console.log('session-tracker started ' + session.name + ' at: ' + session.startPos[0] + ',' + session.startPos[1]);
       broadcastChanges(bus, session.startPos);
+    }
+  });
+}
+
+function sessionUpdate(bus, data) {
+  Session.update({_id: data._id}, {name: data.name, pos: data.pos}, function(err, count){
+    if (err) {
+      console.log('session-tracker: Error update db: ' + err);
+    } else {
+      // bus.emit('session:started', session);
+      console.log('session-tracker update ' + data.name + ' at: ' + data.pos[0] + ',' + data.pos[1]);
+      broadcastChanges(bus, data.pos);
     }
   });
 }
