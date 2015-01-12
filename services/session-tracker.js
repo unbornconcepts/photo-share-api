@@ -32,7 +32,7 @@ function sessionStarted(bus, data) {
 }
 
 function sessionStopped(bus, data) {
-  Session.findOne(data, function(err, session){
+  Session.findById(data._id, function(err, session){
     if (err) {
       console.log('session-tracker: Error deleting from db: ' + err);
     } else if (session === null) {
@@ -48,7 +48,7 @@ function sessionStopped(bus, data) {
 function broadcastChanges(bus, loc) {
   Session.find({pos: { $near: loc, $maxDistance: 0.01} }, function(err, sessions){
     console.log('session-tracker: sending sessions: ' + sessions.length);
-    
+
     // convert the response to simple objects
     var resp = JSON.parse(JSON.stringify(sessions));
     bus.emit('event:sessions', resp);
