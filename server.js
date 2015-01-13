@@ -8,12 +8,8 @@ var io = require('socket.io')(server);
 
 
 io.on('connection', function(socket){
+  console.log('new connection');
   require('./services')(io, socket);
-
-  socket.on('event:new:image',function(data){
-    console.log('new image from ' + data.name);
-    socket.broadcast.emit('event:incoming:image',data);
-  });
 });
 
 server.listen(config.port, function(){
