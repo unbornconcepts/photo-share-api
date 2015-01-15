@@ -32,6 +32,7 @@ function sessionStarted(bus, con, data) {
       // bus.emit('session:started', session);
       var pos = (session.startPos) ? session.startPos[0] + ',' + session.startPos[1] : 'unknown';
       console.log('session-tracker started ' + session.name + ' at: ' + pos);
+      con.emit('event:session:started',session);
       broadcastChanges(bus, session.startPos);
     }
   });
