@@ -1,14 +1,15 @@
 var config = require('config');
 var express = require('express');
 var http = require('http');
+var mongoose = require('mongoose');
 
 var app = express();
 var server = http.Server(app);
 var io = require('socket.io')(server);
 
+mongoose.connect(config.get('db'));
 
 io.on('connection', function(socket){
-  console.log('new connection');
   require('./services')(io, socket);
 });
 
