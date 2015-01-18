@@ -15,7 +15,7 @@ function sessionStarted(bus, con, data) {
   //initialize values
   data.startPos = data.pos;
   data.socket = con.id;
-  session.save(data, function (err, result) {
+  session.create(data, function (err, result) {
     if (!err) {
       var pos = (result.startPos) ? result.startPos[0] + ',' + result.startPos[1] : 'unknown';
       console.log('session-tracker started ' + result.name + ' id: ' + result._id + ' at: ' + pos);
@@ -35,7 +35,7 @@ function sessionUpdate(bus, con, data) {
 }
 
 function sessionStopped(bus, data) {
-  session.remove(data, function(err, result){
+  session.delete(data._id, function(err, result){
     if (!err) {
       console.log('session-tracker: sessionStopped ' + result.name);
       broadcastChanges(bus, data.pos);
@@ -50,7 +50,6 @@ function sendNearby(bus, loc, msg, data) {
 
       // send new session update event to all nearby clients
       async.each(result,function(session){
-        console.log('session-tracker send ' + msg + ' to ' + session.socket + ' data ' + data);
         bus.to(session.socket).emit(msg, data);
       },function(err){
         // error
