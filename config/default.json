@@ -8,5 +8,10 @@
         "colorize": true,
         "timestamp": true
     }
+  },
+  "cloudinary": {
+    "cloud_name": "unbornconcepts",
+    "api_key": "733966567518517",
+    "api_secret": "7xGn1nQCkzrHgWyPLFssJGe7dek"
   }
 }
