@@ -35,7 +35,7 @@ function sessionUpdate(bus, con, data) {
 }
 
 function sessionStopped(bus, data) {
-  session.delete(data._id, function(err, result){
+  session.delete(data, function(err, result){
     if (!err) {
       console.log('session-tracker: sessionStopped ' + result.name);
       broadcastChanges(bus, data.pos);

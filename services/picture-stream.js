@@ -8,11 +8,12 @@ var cloudinary = require('cloudinary');
 cloudinary.config(config.get('cloudinary'));
 
 function initialize(bus, con) {
-  con.on('stream:request', _.partial(sendStream,bus,con));
+  con.on('stream:request', _.partial(sendStream,con));
   con.on('event:new:image', _.partial(addImage,bus,con));
+  con.on('session:stop', sessionStopped);
 }
 
-function sendStream(bus,con, data) {
+function sendStream(con, data) {
   picture.getBySession(data, function(err, results){
     if (!err) {
       results = JSON.parse(JSON.stringify(results));
@@ -52,6 +53,18 @@ function addImage(bus, con, data) {
     imageStream.pipe(stream);
     imageStream.push(new Buffer(data.image));
     imageStream.end();
+  });
+}
+
+function sessionStopped(data) {
+  picture.getBySession(data._id, function(err, pictures){
+    if (!err) {
+      pictures.forEach(function(pic){
+        cloudinary.api.delete_resources([pic.name], function(){
+          picture.delete(pic);
+        });
+      });
+    }
   });
 }
 

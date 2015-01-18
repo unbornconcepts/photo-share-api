@@ -37,7 +37,7 @@ exports.update = function(id, data, callback) {
   });
 }
 
-exports.delete = function(id, data,callback) {
+exports.delete = function(data,callback) {
   Session.findById(data._id, function(err, session){
     if (err) {
       console.log('session: Error deleting from db: ' + err);

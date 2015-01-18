@@ -26,3 +26,17 @@ exports.create = function(data, callback) {
 exports.getBySession = function(session, callback) {
   Picture.find({session: session}, callback);
 }
+
+exports.delete = function(data, callback) {
+  Picture.findOneAndRemove({_id: data._id}, function(err, count){
+    if (err) {
+      console.log('picture: Error deleting from db: ' + err);
+    } else if (count === 0) {
+      console.log('picture: Error finding doc for delete');
+    }
+
+    if (callback) {
+      callback(err, count);
+    }
+  });
+}
