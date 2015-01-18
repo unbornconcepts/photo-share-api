@@ -12,7 +12,7 @@ var Picture = mongoose.model('Picture', {
   url: String
 });
 
-module.exports.create = function(data, callback) {
+exports.create = function(data, callback) {
   var picture = new Picture(data);
   picture.save(function (err, result) {
     if (err) {
@@ -21,4 +21,8 @@ module.exports.create = function(data, callback) {
     }
     callback(err, result);
   });
+}
+
+exports.getBySession = function(session, callback) {
+  Picture.find({session: session}, callback);
 }

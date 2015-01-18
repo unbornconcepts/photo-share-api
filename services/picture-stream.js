@@ -8,7 +8,21 @@ var cloudinary = require('cloudinary');
 cloudinary.config(config.get('cloudinary'));
 
 function initialize(bus, con) {
+  con.on('stream:request', _.partial(sendStream,bus,con));
   con.on('event:new:image', _.partial(addImage,bus,con));
+}
+
+function sendStream(bus,con, data) {
+  picture.getBySession(data, function(err, results){
+    if (!err) {
+      results = JSON.parse(JSON.stringify(results));
+      var thumbs = results.map(function(image){
+        image.thumb = cloudinary.url(image.name, {format: image.format, width: 200, height: 200, crop: 'fill', quality: 50});
+        return image;
+      });
+      con.emit('event:stream', thumbs);
+    }
+  });
 }
 
 function addImage(bus, con, data) {
