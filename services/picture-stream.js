@@ -17,16 +17,18 @@ function sendStream(con, data) {
   picture.getBySession(data, function(err, results){
     if (!err) {
       results = JSON.parse(JSON.stringify(results));
-      var thumbs = results.map(function(image){
-        image.thumb = cloudinary.url(image.name, {format: image.format, width: 200, height: 200, crop: 'fill', quality: 50});
-        return image;
-      });
+      var thumbs = results.map(createThumb);
       con.emit('event:stream', thumbs);
     }
   });
 }
 
-function addImage(bus, con, data) {
+function createThumb(image) {
+  image.thumb = cloudinary.url(image.name, {format: image.format, width: 200, height: 200, crop: 'fill', quality: 50});
+  return image;
+}
+
+function addImage(bus, con, data, callback) {
   session.getBySocket(con.id, function(err, session){
 
     var stream = require("stream");
@@ -34,6 +36,11 @@ function addImage(bus, con, data) {
 
     var stream = cloudinary.uploader.upload_stream(function(image) {
       console.log('image uploaded');
+
+      if (callback) {
+        callback();
+      }
+
       var pic = {
         name: image.public_id,
         session: session.id,
@@ -46,7 +53,9 @@ function addImage(bus, con, data) {
       };
 
       picture.create(pic, function(err, result) {
-        sendNearby(bus, session.pos, 'event:incoming:image', result.toJSON());
+        var result = result.toJSON();
+        createThumb(result);
+        sendNearby(bus, session.pos, 'event:incoming:image', result);
       });
     });
 
