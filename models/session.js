@@ -13,7 +13,7 @@ exports.getBySocket = function(socket, callback) {
 }
 
 exports.getNearby = function(loc, callback) {
-  Session.find({pos: { $near: loc, $maxDistance: 0.0009} }, callback);
+  Session.find({pos: { $near: loc, $maxDistance: 0.005} }, callback);
 }
 
 exports.create = function(data, callback) {
