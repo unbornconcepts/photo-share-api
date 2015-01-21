@@ -13,6 +13,8 @@ io.on('connection', function(socket){
   require('./services')(io, socket);
 });
 
-server.listen(config.port, function(){
-  console.log('express socket.io app started. port: ' + config.port);
+var port = process.env.PORT || config.port; // Use the port that Heroku provides or default
+
+server.listen(port, function(){
+  console.log('express socket.io app started. port: ' + port);
 });

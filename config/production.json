@@ -1,0 +1,8 @@
+{
+  "db": "mongodb://heroku_app33395371:acf87r6d2ijmt0dfu0p8nv17dt@ds031711.mongolab.com:31711/heroku_app33395371",
+  "cloudinary": {
+    "cloud_name": "hjjcbnsv7",
+    "api_key": "935389253522632",
+    "api_secret": "e1LCSM2Z5klrYf65tf_jbom5WBk"
+  }
+}
