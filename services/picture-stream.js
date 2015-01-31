@@ -9,22 +9,51 @@ cloudinary.config(config.get('cloudinary'));
 
 function initialize(bus, con) {
   con.on('stream:request', _.partial(sendStream,con));
+  con.on('stream:all', _.partial(sendNearbyStream,con));
   con.on('event:new:image', _.partial(addImage,bus,con));
   con.on('session:stop', sessionStopped);
 }
 
-function sendStream(con, data) {
+function prepareStreamResults(results) {
+  results = JSON.parse(JSON.stringify(results));
+  var thumbs = results.map(createThumb);
+  return results;
+}
+
+function emitStream(con, err, results) {
+  if (!err) {
+    con.emit('event:stream', prepareStreamResults(results));
+  }
+}
+
+function sendStream(con, data, callback) {
   picture.getBySession(data, function(err, results){
     if (!err) {
-      results = JSON.parse(JSON.stringify(results));
-      var thumbs = results.map(createThumb);
-      con.emit('event:stream', thumbs);
+      if (!callback) {
+        emitStream(con, err, results);
+      } else {
+        callback(prepareStreamResults(results));
+      }
     }
   });
 }
 
+function sendNearbyStream(con) {
+  console.log('sendNearbyStream id ' + con.id);
+  session.getBySocket(con.id, function(err, result){
+    console.log('sendNearbyStream session ' + result.name);
+    session.getNearbyGroup(result, function(err,sessions){
+      if (!err) {
+        console.log('sendNearbyStream count ' + sessions.length);
+        picture.getBySessions(_.pluck(sessions, 'id'), _.partial(emitStream,con));
+      }
+    });
+
+  });
+}
+
 function createThumb(image) {
-  image.thumb = cloudinary.url(image.name, {format: image.format, width: 200, height: 200, crop: 'fill', quality: 50});
+  image.thumb = cloudinary.url(image.name, {format: image.format, width: 100, height: 100, crop: 'fill', quality: 100});
   return image;
 }
 
@@ -37,26 +66,31 @@ function addImage(bus, con, data, callback) {
     var stream = cloudinary.uploader.upload_stream(function(image) {
       console.log('image uploaded');
 
+      // send back to the client to acknowledge upload completed
       if (callback) {
         callback();
       }
 
-      var pic = {
-        name: image.public_id,
-        session: session.id,
-        sender: data.sender,
-        width: image.width,
-        height: image.height,
-        format: image.format,
-        resource_type: image.resource_type,
-        url: image.url
-      };
+      if (image.public_id) {
+        var pic = {
+          name: image.public_id,
+          session: session.id,
+          sender: data.sender,
+          width: image.width,
+          height: image.height,
+          format: image.format,
+          resource_type: image.resource_type,
+          url: image.url
+        };
 
-      picture.create(pic, function(err, result) {
-        var result = result.toJSON();
-        createThumb(result);
-        sendNearby(bus, session.pos, 'event:incoming:image', result);
-      });
+        picture.create(pic, function(err, result) {
+          if (!err) {
+            var result = result.toJSON();
+            createThumb(result);
+            sendNearby(bus, session.pos, 'event:incoming:image', result);
+          }
+        });
+      }
     });
 
     imageStream.pipe(stream);

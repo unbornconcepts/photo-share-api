@@ -59,7 +59,7 @@ function sendNearby(bus, loc, msg, data) {
 }
 
 function sendImage(bus,con,data) {
-  session.getBySocket({socket: con.id}, function(err, result){
+  session.getBySocket(con.id, function(err, result){
     if (result.length > 0) {
       var session = result[0];
       console.log('new image from ' + session.name);

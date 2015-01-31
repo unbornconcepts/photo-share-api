@@ -16,6 +16,11 @@ exports.getNearby = function(loc, callback) {
   Session.find({pos: { $near: loc, $maxDistance: 0.001} }, callback);
 }
 
+exports.getNearbyGroup = function(session, callback) {
+  console.log('getNearbyGroup ' + JSON.stringify(session));
+  Session.find({pos: { $near: session.pos, $maxDistance: 0.001}, name: session.name }, callback);
+}
+
 exports.create = function(data, callback) {
   var session = new Session(data);
   session.save(function (err, result) {

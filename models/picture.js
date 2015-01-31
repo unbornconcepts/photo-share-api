@@ -27,6 +27,10 @@ exports.getBySession = function(session, callback) {
   Picture.find({session: session}, callback);
 }
 
+exports.getBySessions = function(sessions, callback) {
+  Picture.find({session: {$in: sessions}}, callback);
+}
+
 exports.delete = function(data, callback) {
   Picture.findOneAndRemove({_id: data._id}, function(err, count){
     if (err) {
