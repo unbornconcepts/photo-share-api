@@ -54,6 +54,7 @@ function sendNearbyStream(con) {
 
 function createThumb(image) {
   image.thumb = cloudinary.url(image.name, {format: image.format, width: 100, height: 100, crop: 'fill', quality: 100});
+  image.scaled = cloudinary.url(image.name, {format: image.format, crop: 'scale', width: 0.5, quality: 100});
   return image;
 }
 
